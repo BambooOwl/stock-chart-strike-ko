@@ -94,6 +94,9 @@ def plot_group(df: pd.DataFrame,
 
     fig.subplots_adjust(top=0.85, right=0.84, hspace=0.45, left=0.06)
 
+    if n == 1:
+        fig.subplots_adjust(top=0.78)
+                   
     for ax, ticker in zip(axs, df.columns):
         series = df[ticker]
         base_price = series.iloc[-1]
