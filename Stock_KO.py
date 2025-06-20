@@ -156,7 +156,7 @@ def chunk(iterable: Iterable, size: int):
 def main() -> None:
     st.set_page_config(page_title="Stock Chart Tool", layout="centered")
 
-    t_in         = st.text_input("Tickers (comma separated)", "GLD,GDX,SPY,IBIT")
+    t_in         = st.text_input("Tickers (comma separated)", "MSFT,NVDA,AAPL,AMZN,GOOGL,META,TSLA")
     ko_ratio     = st.number_input("KO ratio (blank = NA)", value=1.05, step=0.01)
     strike_ratio = st.number_input("Strike ratio (blank = NA)", value=0.80, step=0.01)
     ki_ratio     = st.number_input("KI ratio (optional)", value=0.0, step=0.01)
