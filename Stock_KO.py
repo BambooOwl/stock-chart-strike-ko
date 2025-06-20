@@ -81,8 +81,8 @@ def plot_group(df: pd.DataFrame,
     fig.text(0.01, 0.94, "Stock Chart Tool", color='#c33b31', fontsize=12, fontweight="bold", va="top", ha="left")
     fig.text(0.01, 0.92, f"Strike = {ratio_strike},  KO = {ratio_ko},  KI = {ratio_ki}",
              fontsize=11, fontweight="bold", va="top", ha="left")
-    fig.text(0.01, 0.90, "Source: Yahoo Finance,   Developed for UOB Kay Hian Private Wealth Research", fontsize=8, fontstyle="italic", va="top", ha="left")
-    fig.text(0.01, 0.89, "Developed by Kit / Shi Jie", fontsize=8,
+    fig.text(0.01, 0.90, "Source: Yahoo Finance, all data as indicative only.", fontsize=8, fontstyle="italic", va="top", ha="left")
+    fig.text(0.01, 0.89, "Developed by Kit / Shi Jie,   Developed for UOB Kay Hian Private Wealth Research", fontsize=8,
              fontstyle="italic", va="top", ha="left")
     fig.text(0.99, 0.94, f"Generated: {gen_date:%d %b %Y}", fontsize=9, va="top", ha="right")
     fig.text(0.99, 0.92, f"Latest price: {latest_price_date:%d %b %Y}", fontsize=9, va="top", ha="right")
