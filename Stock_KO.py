@@ -70,11 +70,12 @@ def plot_group(df: pd.DataFrame,
                latest_price_date: dt.date) -> plt.Figure:
 
     n = df.shape[1]
-    if n == 1:
-        fig_size = (7, 9)
-    else:
-        fig_size = (7, 11)
-    fig, axs = plt.subplots(n, 1, figsize=fig_size)
+
+    HEADER_H = 2.0
+    ROW_H = 3.5
+    fig_h = HEADER_H + ROW_H * n
+                   
+    fig, axs = plt.subplots(n, 1, figsize=(7, fig_h))
     axs = [axs] if n == 1 else axs
 
     # ── Header block ─────────────────────────────────────────────────────────
