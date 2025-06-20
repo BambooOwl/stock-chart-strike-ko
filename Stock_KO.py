@@ -39,7 +39,7 @@ def fetch_prices(tickers: List[str], start: str) -> pd.DataFrame:
     else:
         cand = [c for c in ("Adj Close", "Close") if c in raw.columns]
         df = raw[cand] if cand else raw.to_frame(name=tickers[0])
-    df.columns = [str(c).split(".")[0] for c in df.columns]
+    df.columns = [str(c) for c in df.columns]
     return df.ffill().dropna(how="all")
 
 
@@ -48,6 +48,16 @@ def long_name(ticker: str) -> str:
         return yf.Ticker(ticker).info.get("longName") or ticker
     except Exception:
         return ticker
+
+def _header_y_positions(n):
+    """
+    Return y coordinates (top-to-bottom) for the four header lines.
+    If only 1–2 charts, use looser spacing; otherwise keep compact.
+    """
+    if n < 3:                       # wide spacing
+        return 0.97, 0.93, 0.89, 0.85
+    else:                           # original compact block
+        return 0.97, 0.94, 0.91, 0.88
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Plotting
@@ -83,16 +93,19 @@ def plot_group(df: pd.DataFrame,
     ratio_ko     = f"{ko_ratio:.0%}"    if ko_ratio     else "NA"
     ratio_ki     = f"{ki_ratio:.0%}"    if ki_ratio     else "NA"
 
-    fig.text(0.01, 0.94, "Stock Chart Tool", color='#c33b31', fontsize=12, fontweight="bold", va="top", ha="left")
-    fig.text(0.01, 0.92, f"Strike = {ratio_strike},  KO = {ratio_ko},  KI = {ratio_ki}",
+    y_title, y_ratios, y_source, y_credit = _header_y_positions(n)
+                   
+    fig.text(0.01, y_title, "Stock Chart Tool", color='#c33b31', fontsize=12, fontweight="bold", va="top", ha="left")
+    fig.text(0.01, y_ratios, f"Strike = {ratio_strike},  KO = {ratio_ko},  KI = {ratio_ki}",
              fontsize=11, fontweight="bold", va="top", ha="left")
-    fig.text(0.01, 0.90, "Source: Yahoo Finance, all data as indicative only.", fontsize=8, fontstyle="italic", va="top", ha="left")
-    fig.text(0.01, 0.89, "Developed by Kit / Shi Jie,   Developed for UOB Kay Hian Private Wealth Research", fontsize=8,
+    fig.text(0.01, y_source, "Source: Yahoo Finance, all data as indicative only.", fontsize=8, fontstyle="italic", va="top", ha="left")
+    fig.text(0.01, y_credit, "Developed by Kit / Shi Jie,   Developed for UOB Kay Hian Private Wealth Research", fontsize=8,
              fontstyle="italic", va="top", ha="left")
+    
     fig.text(0.99, 0.94, f"Generated: {gen_date:%d %b %Y}", fontsize=9, va="top", ha="right")
     fig.text(0.99, 0.92, f"Latest price: {latest_price_date:%d %b %Y}", fontsize=9, va="top", ha="right")
 
-    fig.subplots_adjust(top=0.85, right=0.84, hspace=0.45, left=0.06)
+    fig.subplots_adjust(top=y_credit - 0.04, right=0.84, hspace=0.45, left=0.06)
 
     if n == 1:
         fig.subplots_adjust(top=0.78)
