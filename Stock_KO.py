@@ -110,9 +110,6 @@ def plot_group(df: pd.DataFrame,
     fig.text(0.99, 0.92, f"Latest price: {latest_price_date:%d %b %Y}", fontsize=9, va="top", ha="right")
 
     fig.subplots_adjust(top=y_credit - 0.04, right=0.84, hspace=0.45, left=0.06)
-
-    if n == 1:
-        fig.subplots_adjust(top=0.78)
                    
     for ax, ticker in zip(axs, df.columns):
         series = df[ticker]
