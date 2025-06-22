@@ -31,6 +31,10 @@ WATERMARK_TEXT = "UOB Kay Hian PWM Product Team"
 # Helpers
 # ──────────────────────────────────────────────────────────────────────────────
 
+def _clean(col):
+    col = str(col)
+    return col if "." in col and col.count(".") == 1 else col.split(".")[0]
+
 def fetch_prices(tickers: List[str], start: str) -> pd.DataFrame:
     raw = yf.download(tickers, start=start, auto_adjust=False, progress=False)
     if isinstance(raw.columns, pd.MultiIndex):
@@ -39,7 +43,7 @@ def fetch_prices(tickers: List[str], start: str) -> pd.DataFrame:
     else:
         cand = [c for c in ("Adj Close", "Close") if c in raw.columns]
         df = raw[cand] if cand else raw.to_frame(name=tickers[0])
-    df.columns = [str(c) for c in df.columns]
+    df.columns = [_clean(c) for c in df.columns]
     return df.ffill().dropna(how="all")
 
 
