@@ -61,7 +61,7 @@ def _header_y_positions(n):
     if n < 3:                       # wide spacing
         return 0.97, 0.93, 0.89, 0.85
     else:                           # original compact block
-        return 0.97, 0.94, 0.91, 0.88
+        return 0.97, 0.95, 0.93, 0.91
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Plotting
