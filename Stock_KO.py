@@ -56,12 +56,21 @@ def long_name(ticker: str) -> str:
 def _header_y_positions(n):
     """
     Return y coordinates (top-to-bottom) for the four header lines.
-    If only 1–2 charts, use looser spacing; otherwise keep compact.
+    * 1 chart  → very wide spacing
+    * 2 charts → wide spacing
+    * 3 charts → medium
+    * 4 charts → tightest
     """
-    if n < 3:                       # wide spacing
-        return 0.97, 0.93, 0.89, 0.85
-    else:                           # original compact block
-        return 0.975, 0.955, 0.935, 0.915
+    base = 0.97            # title line
+    if n == 1:
+        gap = 0.04         # ≈ 0.4 in on an 11-inch canvas
+    elif n == 2:
+        gap = 0.03
+    elif n == 3:
+        gap = 0.025
+    else:                  # n >= 4
+        gap = 0.02
+    return base, base-gap, base-2*gap, base-3*gap
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Plotting
@@ -109,7 +118,8 @@ def plot_group(df: pd.DataFrame,
     fig.text(0.99, 0.94, f"Generated: {gen_date:%d %b %Y}", fontsize=9, va="top", ha="right")
     fig.text(0.99, 0.92, f"Latest price: {latest_price_date:%d %b %Y}", fontsize=9, va="top", ha="right")
 
-    fig.subplots_adjust(top=y_credit - 0.02, right=0.84, hspace=0.45, left=0.06)
+    gap = y_title - y_ratios
+    fig.subplots_adjust(top=y_credit - gap, right=0.84, hspace=0.45, left=0.06)
                    
     for ax, ticker in zip(axs, df.columns):
         series = df[ticker]
