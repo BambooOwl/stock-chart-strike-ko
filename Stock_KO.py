@@ -61,7 +61,7 @@ def _header_y_positions(n):
     if n < 3:                       # wide spacing
         return 0.97, 0.93, 0.89, 0.85
     else:                           # original compact block
-        return 0.97, 0.95, 0.93, 0.91
+        return 0.975, 0.955, 0.935, 0.915
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Plotting
@@ -109,7 +109,7 @@ def plot_group(df: pd.DataFrame,
     fig.text(0.99, 0.94, f"Generated: {gen_date:%d %b %Y}", fontsize=9, va="top", ha="right")
     fig.text(0.99, 0.92, f"Latest price: {latest_price_date:%d %b %Y}", fontsize=9, va="top", ha="right")
 
-    fig.subplots_adjust(top=y_credit - 0.04, right=0.84, hspace=0.45, left=0.06)
+    fig.subplots_adjust(top=y_credit - 0.02, right=0.84, hspace=0.45, left=0.06)
                    
     for ax, ticker in zip(axs, df.columns):
         series = df[ticker]
