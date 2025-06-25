@@ -89,6 +89,7 @@ def plot_group(df: pd.DataFrame,
                ko_ratio: Optional[float],
                strike_ratio: Optional[float],
                ki_ratio: Optional[float],
+               ko_pct, strike_pct, ki_pct,
                gen_date: dt.date,
                latest_price_date: dt.date) -> plt.Figure:
 
@@ -102,9 +103,9 @@ def plot_group(df: pd.DataFrame,
     axs = [axs] if n == 1 else axs
 
     # ── Header block ─────────────────────────────────────────────────────────
-    ratio_strike = f"{strike_ratio*100:.0%}" if strike_ratio else "NA"
-    ratio_ko     = f"{ko_ratio*100:.0%}"    if ko_ratio     else "NA"
-    ratio_ki     = f"{ki_ratio*100:.0%}"    if ki_ratio     else "NA"
+    ratio_strike = f"{strike_pct}%" if strike_ratio else "NA"
+    ratio_ko     = f"{ko_pct}%"    if ko_ratio     else "NA"
+    ratio_ki     = f"{ki_pct}%"    if ki_ratio     else "NA"
 
     y_title, y_ratios, y_source, y_credit = _header_y_positions(n)
                    
@@ -115,11 +116,11 @@ def plot_group(df: pd.DataFrame,
     fig.text(0.01, y_credit, "Developed by Kit,   Developed for UOB Kay Hian Private Wealth Research", fontsize=8,
              fontstyle="italic", va="top", ha="left")
     
-    fig.text(0.99, 0.98, f"Generated: {gen_date:%d %b %Y}", fontsize=9, va="top", ha="right")
-    fig.text(0.99, 0.96, f"Latest price: {latest_price_date:%d %b %Y}", fontsize=9, va="top", ha="right")
+    fig.text(0.99, 0.97, f"Generated: {gen_date:%d %b %Y}", fontsize=9, va="top", ha="right")
+    fig.text(0.99, 0.95, f"Latest price: {latest_price_date:%d %b %Y}", fontsize=9, va="top", ha="right")
 
     gap = y_title - y_ratios
-    fig.subplots_adjust(top=y_credit - gap/2, right=0.84, hspace=0.45, left=0.06)
+    fig.subplots_adjust(top=y_credit - 0.03, right=0.84, hspace=0.45, left=0.06)
                    
     for ax, ticker in zip(axs, df.columns):
         series = df[ticker]
@@ -219,6 +220,7 @@ def main() -> None:
                                  ko_ratio or None,
                                  strike_ratio or None,
                                  ki_ratio if use_ki else None,
+                                 ko_pct, strike_pct, ki_pct,
                                  gen_date,
                                  latest_price_date)
                 st.pyplot(fig)
