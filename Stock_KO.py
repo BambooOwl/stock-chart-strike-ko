@@ -102,9 +102,9 @@ def plot_group(df: pd.DataFrame,
     axs = [axs] if n == 1 else axs
 
     # ── Header block ─────────────────────────────────────────────────────────
-    ratio_strike = f"{strike_ratio:.0%}" if strike_ratio else "NA"
-    ratio_ko     = f"{ko_ratio:.0%}"    if ko_ratio     else "NA"
-    ratio_ki     = f"{ki_ratio:.0%}"    if ki_ratio     else "NA"
+    ratio_strike = f"{strike_ratio*100:.0%}" if strike_ratio else "NA"
+    ratio_ko     = f"{ko_ratio*100:.0%}"    if ko_ratio     else "NA"
+    ratio_ki     = f"{ki_ratio*100:.0%}"    if ki_ratio     else "NA"
 
     y_title, y_ratios, y_source, y_credit = _header_y_positions(n)
                    
@@ -112,14 +112,14 @@ def plot_group(df: pd.DataFrame,
     fig.text(0.01, y_ratios, f"Strike = {ratio_strike},  KO = {ratio_ko},  KI = {ratio_ki}",
              fontsize=11, fontweight="bold", va="top", ha="left")
     fig.text(0.01, y_source, "Source: Yahoo Finance, all data as indicative only.", fontsize=8, fontstyle="italic", va="top", ha="left")
-    #fig.text(0.01, y_credit, "Developed by Kit / Shi Jie,   Developed for UOB Kay Hian Private Wealth Research", fontsize=8,
-    #         fontstyle="italic", va="top", ha="left")
+    fig.text(0.01, y_credit, "Developed by Kit,   Developed for UOB Kay Hian Private Wealth Research", fontsize=8,
+             fontstyle="italic", va="top", ha="left")
     
-    fig.text(0.99, 0.94, f"Generated: {gen_date:%d %b %Y}", fontsize=9, va="top", ha="right")
-    fig.text(0.99, 0.92, f"Latest price: {latest_price_date:%d %b %Y}", fontsize=9, va="top", ha="right")
+    fig.text(0.99, 0.98, f"Generated: {gen_date:%d %b %Y}", fontsize=9, va="top", ha="right")
+    fig.text(0.99, 0.96, f"Latest price: {latest_price_date:%d %b %Y}", fontsize=9, va="top", ha="right")
 
     gap = y_title - y_ratios
-    fig.subplots_adjust(top=y_credit - gap, right=0.84, hspace=0.45, left=0.06)
+    fig.subplots_adjust(top=y_credit - gap/2, right=0.84, hspace=0.45, left=0.06)
                    
     for ax, ticker in zip(axs, df.columns):
         series = df[ticker]
@@ -189,11 +189,15 @@ def main() -> None:
     st.set_page_config(page_title="Stock Chart Tool", layout="centered")
 
     t_in         = st.text_input("Tickers (comma separated)", "MSFT,NVDA,AAPL,AMZN,GOOGL,META,TSLA")
-    ko_ratio     = st.number_input("KO ratio (blank = NA)", value=1.05, step=0.01)
-    strike_ratio = st.number_input("Strike ratio (blank = NA)", value=0.80, step=0.01)
-    ki_ratio     = st.number_input("KI ratio (optional)", value=0.0, step=0.01)
+    ko_pct     = st.number_input("KO (%)", value=105, step=1)
+    strike_pct = st.number_input("Strike (%)", value=80,  step=1)
+    ki_pct     = st.number_input("KI (%)", value=0, step=1)
     use_ki       = st.checkbox("Enable KI", value=False)
 
+    ko_ratio     = ko_pct / 100 if ko_pct else None
+    strike_ratio = strike_pct / 100 if strike_pct else None
+    ki_ratio     = ki_pct / 100 if use_ki and ki_pct else None
+    
     if st.button("Generate charts"):
         tickers = [s.strip().upper() for s in t_in.split(',') if s.strip()]
         if not tickers:
