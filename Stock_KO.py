@@ -53,24 +53,28 @@ def long_name(ticker: str) -> str:
     except Exception:
         return ticker
 
-def _header_y_positions(n):
+def _header_y_positions(n: int):
     """
-    Return y coordinates (top-to-bottom) for the four header lines.
-    * 1 chart  → very wide spacing
-    * 2 charts → wide spacing
-    * 3 charts → medium
-    * 4 charts → tightest
+    Returns y coordinates, top to bottom.
+    Gap between title ↔ ratios ↔ source is dynamic,
+    but source ↔ credit is a tight 0.01.
     """
     base = 0.97            # title line
     if n == 1:
-        gap = 0.04         # ≈ 0.4 in on an 11-inch canvas
+        g1 = 0.04
+        g2 = 0.03
     elif n == 2:
-        gap = 0.03
+        g1, g2 = 0.03, 0.025
     elif n == 3:
-        gap = 0.025
+        g1, g2 = 0.025, 0.02
     else:                  # n >= 4
-        gap = 0.02
-    return base, base-gap, base-2*gap, base-3*gap
+        g1, g2 = 0.02, 0.02
+
+    y_title = base
+    y_ratios = base - g1
+    y_source = y_ratios -g2
+    y_credit = y_source - 0.01
+    return y_title, y_ratios, y_source, y_credit
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Plotting
@@ -119,12 +123,7 @@ def plot_group(df: pd.DataFrame,
     fig.text(0.99, 0.97, f"Generated: {gen_date:%d %b %Y}", fontsize=9, va="top", ha="right")
     fig.text(0.99, 0.95, f"Latest price: {latest_price_date:%d %b %Y}", fontsize=9, va="top", ha="right")
 
-    gap = y_title - y_ratios
-    if n < 3:
-        top_pad = gap
-    else: 
-        top_pad = 0.03
-    fig.subplots_adjust(top=y_credit - top_pad, right=0.84, hspace=0.45, left=0.06)
+    fig.subplots_adjust(top=y_credit - 0.03, right=0.84, hspace=0.45, left=0.06)
                    
     for ax, ticker in zip(axs, df.columns):
         series = df[ticker]
