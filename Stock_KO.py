@@ -107,11 +107,15 @@ def plot_group(df: pd.DataFrame,
     axs = [axs] if n == 1 else axs
 
     # ── Header block ─────────────────────────────────────────────────────────
-    ratio_strike = f"{strike_pct}%" if strike_ratio else "NA"
-    ratio_ko     = f"{ko_pct}%"    if ko_ratio     else "NA"
-    ratio_ki     = f"{ki_pct}%"    if ki_ratio     else "NA"
+    ratio_strike = f"{strike_pct}%" if strike_pct else "NA"
+    ratio_ko     = f"{ko_pct}%"    if ko_pct     else "NA"
+    ratio_ki     = f"{ki_pct}%"    if ki_pct     else "NA"
 
     y_title, y_ratios, y_source, y_credit = _header_y_positions(n)
+
+    header_height = y_title - y_credit
+    padding = 0.02
+    top_margin = 1 - (header_height + padding)
                    
     fig.text(0.01, y_title, "Stock Chart Tool", color='#c33b31', fontsize=12, fontweight="bold", va="top", ha="left")
     fig.text(0.01, y_ratios, f"Strike = {ratio_strike},  KO = {ratio_ko},  KI = {ratio_ki}",
@@ -123,7 +127,7 @@ def plot_group(df: pd.DataFrame,
     fig.text(0.99, 0.97, f"Generated: {gen_date:%d %b %Y}", fontsize=9, va="top", ha="right")
     fig.text(0.99, 0.95, f"Latest price: {latest_price_date:%d %b %Y}", fontsize=9, va="top", ha="right")
 
-    fig.subplots_adjust(top=y_credit - 0.03, right=0.84, hspace=0.45, left=0.06)
+    fig.subplots_adjust(top=top_margin, right=0.84, hspace=0.45, left=0.06)
                    
     for ax, ticker in zip(axs, df.columns):
         series = df[ticker]
