@@ -1,8 +1,5 @@
 """
 Streamlit Stock Chart Tool — v2.1 (completed)
-
-This build rolls back to v1.9 and adds two date stamps (Generated & Latest
-price) in the top‑right corner of every page. No other new features.
 """
 
 import io
@@ -14,6 +11,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.ticker import FuncFormatter
+from matplotlib.gridspec import GridSpec
 import streamlit as st
 import yfinance as yf
 from matplotlib.backends.backend_pdf import PdfPages
@@ -94,40 +92,64 @@ def plot_group(df: pd.DataFrame,
                strike_ratio: Optional[float],
                ki_ratio: Optional[float],
                ko_pct, strike_pct, ki_pct,
+               coupon_pa, tenor_months, stepdown_pct,
                gen_date: dt.date,
                latest_price_date: dt.date) -> plt.Figure:
 
     n = df.shape[1]
 
     HEADER_H = 2.0
-    ROW_H = 3.5
+    ROW_H = 2.75
     fig_h = HEADER_H + ROW_H * n
                    
-    fig, axs = plt.subplots(n, 1, figsize=(7, fig_h))
-    axs = [axs] if n == 1 else axs
+    fig = plt.figure(figsize=(7, fig_h))
 
-    # ── Header block ─────────────────────────────────────────────────────────
-    ratio_strike = f"{strike_pct}%" if strike_pct else "NA"
-    ratio_ko     = f"{ko_pct}%"    if ko_pct     else "NA"
-    ratio_ki     = f"{ki_pct}%"    if ki_pct     else "NA"
+    # outer grid: row0 for header (1 unit tall), row1 for charts (n units tall)
+    outer = GridSpec(2, 1,
+                     height_ratios=[HEADER_H, ROW_H * n],
+                     hspace=-0.06,        # Space between Top Wording and Bottom Chart (The Empty Zone)
+                     figure=fig)
 
-    y_title, y_ratios, y_source, y_credit = _header_y_positions(n)
+    # --- HEADER AXES (row 0) ---
+    axh = fig.add_subplot(outer[0])
+    axh.axis("off")   # hide the spines/ticks
 
-    header_height = y_title - y_credit
-    padding = 0.02
-    top_margin = 1 - (header_height + padding)
-                   
-    fig.text(0.01, y_title, "Stock Chart Tool", color='#c33b31', fontsize=12, fontweight="bold", va="top", ha="left")
-    fig.text(0.01, y_ratios, f"Strike = {ratio_strike},  KO = {ratio_ko},  KI = {ratio_ki}",
-             fontsize=11, fontweight="bold", va="top", ha="left")
-    fig.text(0.01, y_source, "Source: Yahoo Finance, all data as indicative only.", fontsize=8, fontstyle="italic", va="top", ha="left")
-    fig.text(0.01, y_credit, "Developed by Kit,   Developed for UOB Kay Hian Private Wealth Research", fontsize=8,
-             fontstyle="italic", va="top", ha="left")
-    
-    fig.text(0.99, 0.97, f"Generated: {gen_date:%d %b %Y}", fontsize=9, va="top", ha="right")
-    fig.text(0.99, 0.95, f"Latest price: {latest_price_date:%d %b %Y}", fontsize=9, va="top", ha="right")
+    # place your four header lines here in axh coordinates
+    axh.text(-0.05, 0.85, "Stock Chart Tool",
+             fontsize=12, fontweight="bold", color="#c33b31",
+             transform=axh.transAxes, ha="left", va="center")
 
-    fig.subplots_adjust(top=top_margin, right=0.84, hspace=0.45, left=0.06)
+    axh.text(-0.05, 0.75,
+             f"Strike = {strike_pct}%,  KO = {ko_pct}%,  KI = {ki_pct or 'NA'}",
+             fontsize=11, fontweight="bold",
+             transform=axh.transAxes, ha="left", va="center")
+
+    axh.text(-0.05, 0.65,
+             f"Coupon p.a. = {coupon_pa}%,  Tenor (months) = {tenor_months}, Stepdown (%) = {stepdown_pct or 'NA'}",
+             fontsize=11, fontweight="bold",
+             transform=axh.transAxes, ha="left", va="center")
+
+    axh.text(-0.05, 0.55,
+             "Source: Yahoo Finance, all data as indicative only.",
+             fontsize=8, fontstyle="italic",
+             transform=axh.transAxes, ha="left", va="center")
+
+    axh.text(-0.05, 0.45,
+             "Developed by Kit,   Developed for UOB Kay Hian Private Wealth Research",
+             fontsize=8, fontstyle="italic",
+             transform=axh.transAxes, ha="left", va="center")
+
+    axh.text(1.12, 0.85, f"Generated: {gen_date:%d %b %Y}",
+             fontsize=9, transform=axh.transAxes,
+             ha="right", va="center")
+
+    axh.text(1.12, 0.75, f"Latest price: {latest_price_date:%d %b %Y}",
+             fontsize=9, transform=axh.transAxes,
+             ha="right", va="center")
+
+    # --- CHART AXES (row 1 subdivided into n sub-rows) ---
+    inner = outer[1].subgridspec(n, 1, hspace=0.4)
+    axs   = [fig.add_subplot(inner[i, 0]) for i in range(n)]
                    
     for ax, ticker in zip(axs, df.columns):
         series = df[ticker]
@@ -164,7 +186,7 @@ def plot_group(df: pd.DataFrame,
             ax.spines[side].set_visible(False)
 
         ax.grid(True, linestyle=":", linewidth=0.4, color=GRID_GREY, alpha=0.8)
-        ax.set_title(f"{long_name(ticker)} ({ticker}), Price: {base_price:.2f}", fontsize=10, pad=8)
+        ax.set_title(f"{long_name(ticker)} ({ticker}), Price: {series.iloc[-1]:.2f}", fontsize=10, pad=8)
         ax.tick_params(labelsize=8)
 
         ax.set_xlim(series.index[0], series.index[-1])
@@ -197,9 +219,23 @@ def main() -> None:
     st.set_page_config(page_title="Stock Chart Tool", layout="centered")
 
     t_in         = st.text_input("Tickers (comma separated)", "MSFT,NVDA,AAPL,AMZN,GOOGL,META,TSLA")
-    ko_pct     = st.number_input("KO (%)", value=105, step=1)
-    strike_pct = st.number_input("Strike (%)", value=80,  step=1)
-    ki_pct     = st.number_input("KI (%)", value=0, step=1)
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        ko_pct     = st.number_input("KO (%)", value=105, step=1)
+    with col2:
+        strike_pct = st.number_input("Strike (%)", value=80,  step=1)
+    with col3:
+        ki_pct     = st.number_input("KI (%)", value=0, step=1)
+
+    col4, col5, col6 = st.columns(3)
+    with col4:
+        coupon_pa = st.number_input("Coupon p.a. (%)", value=12, step=1)
+    with col5:
+        tenor_months = st.number_input("Tenor (months)", value=3, step=1)
+    with col6:
+        stepdown_pct = st.number_input("Stepdown (%)", value=1, step=1)
+    
     use_ki       = st.checkbox("Enable KI", value=False)
 
     ko_ratio     = ko_pct / 100 if ko_pct else None
@@ -228,10 +264,11 @@ def main() -> None:
                                  strike_ratio or None,
                                  ki_ratio if use_ki else None,
                                  ko_pct, strike_pct, ki_pct,
+                                 coupon_pa, tenor_months, stepdown_pct,
                                  gen_date,
                                  latest_price_date)
                 st.pyplot(fig)
-                pdf.savefig(fig)
+                pdf.savefig(fig, bbox_inches="tight", pad_inches=0.1)
                 plt.close(fig)
 
         buf.seek(0)
