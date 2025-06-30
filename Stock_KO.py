@@ -34,7 +34,8 @@ def _clean(col):
     return col if "." in col and col.count(".") == 1 else col.split(".")[0]
 
 def fetch_prices(tickers: List[str], start: str) -> pd.DataFrame:
-    raw = yf.download(tickers, start=start, auto_adjust=False, progress=False)
+    end = (dt.date.today() + dt.timedelta(days=1)).strftime("%Y-%m-%d")
+    raw = yf.download(tickers, start=start, end=end, auto_adjust=False, progress=False)
     if isinstance(raw.columns, pd.MultiIndex):
         key = "Adj Close" if "Adj Close" in raw.columns.get_level_values(0) else "Close"
         df = raw[key]
