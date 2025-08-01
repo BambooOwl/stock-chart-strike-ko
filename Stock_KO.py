@@ -225,11 +225,11 @@ def main() -> None:
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        ko_pct     = st.number_input("KO (%)", value=105.00, step=0.01, format="%.2f", min_value=0.0)
+        ko_pct     = st.number_input("KO (%)", value=105.50, step=0.01, format="%.2f", min_value=0.0)
     with col2:
-        strike_pct = st.number_input("Strike (%)", value=80.00, step=0.01, format="%.2f", min_value=0.0)
+        strike_pct = st.number_input("Strike (%)", value=80.50, step=0.01, format="%.2f", min_value=0.0)
     with col3:
-        ki_pct     = st.number_input("KI (%)", value=0.00, step=0.01, format="%.2f", min_value=0.0)
+        ki_pct     = st.number_input("KI (%)", value=55.55, step=0.01, format="%.2f", min_value=0.0)
 
     col4, col5, col6 = st.columns(3)
     with col4:
