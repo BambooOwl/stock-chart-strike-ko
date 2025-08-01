@@ -121,12 +121,14 @@ def plot_group(df: pd.DataFrame,
              transform=axh.transAxes, ha="left", va="center")
 
     axh.text(-0.05, 0.75,
-             f"Strike = {strike_pct}%,  KO = {ko_pct}%,  KI = {ki_pct or 'NA'}",
+             f"Strike = {strike_pct:.2f}%,  KO = {ko_pct:.2f}%,  KI = {ki_pct:.2f}" if ki_pct else
+             f"Strike = {strike_pct:.2f}%,  KO = {ko_pct:.2f}%,  KI = NA",
              fontsize=11, fontweight="bold",
              transform=axh.transAxes, ha="left", va="center")
 
     axh.text(-0.05, 0.65,
-             f"Coupon p.a. = {coupon_pa}%,  Tenor (months) = {tenor_months}, Stepdown (%) = {stepdown_pct or 'NA'}",
+             f"Coupon p.a. = {coupon_pa:.2f}%,  Tenor (months) = {tenor_months:.0f}, Stepdown (%) = {stepdown_pct:.2f}" if stepdown_pct else
+             f"Coupon p.a. = {coupon_pa:.2f}%,  Tenor (months) = {tenor_months:.0f}, Stepdown (%) = NA",
              fontsize=11, fontweight="bold",
              transform=axh.transAxes, ha="left", va="center")
 
