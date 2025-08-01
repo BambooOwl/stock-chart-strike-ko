@@ -223,21 +223,21 @@ def main() -> None:
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        ko_pct     = st.number_input("KO (%)", value=105, step=1)
+        ko_pct     = st.number_input("KO (%)", value=105.00, step=0.01, format="%.2f", min_value=0.0)
     with col2:
-        strike_pct = st.number_input("Strike (%)", value=80,  step=1)
+        strike_pct = st.number_input("Strike (%)", value=80.00, step=0.01, format="%.2f", min_value=0.0)
     with col3:
-        ki_pct     = st.number_input("KI (%)", value=0, step=1)
+        ki_pct     = st.number_input("KI (%)", value=0, step=0.01, format="%.2f", min_value=0.0)
 
     col4, col5, col6 = st.columns(3)
     with col4:
-        coupon_pa = st.number_input("Coupon p.a. (%)", value=12, step=1)
+        coupon_pa = st.number_input("Coupon p.a. (%)", value=12.00, step=0.01, format="%.2f", min_value=0.0)
     with col5:
-        tenor_months = st.number_input("Tenor (months)", value=3, step=1)
+        tenor_months = st.number_input("Tenor (months)", value=3.00, step=0.01, format="%.2f", min_value=0.0)
     with col6:
-        stepdown_pct = st.number_input("Stepdown (%)", value=1, step=1)
+        stepdown_pct = st.number_input("Stepdown (%)", value=1.00, step=0.01, format="%.2f", min_value=0.0)
     
-    use_ki       = st.checkbox("Enable KI", value=False)
+    use_ki       = st.checkbox("Enable KI", value=True)
 
     ko_ratio     = ko_pct / 100 if ko_pct else None
     strike_ratio = strike_pct / 100 if strike_pct else None
